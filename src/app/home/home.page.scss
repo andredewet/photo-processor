@@ -320,6 +320,67 @@ html, body {
   }
 }
 
+// ===== Sensitivity Slider =====
+.sensitivity-control {
+  margin-top: 12px;
+  width: min(280px, 80vw);
+  padding: 0 8px;
+}
+
+.sensitivity-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 12px;
+  
+  .label-text {
+    color: #5f6368;
+  }
+  
+  .label-value {
+    color: #1a73e8;
+    font-weight: 500;
+  }
+}
+
+.sensitivity-slider {
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: #e8eaed;
+  border-radius: 2px;
+  outline: none;
+  
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #1a73e8;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.1s;
+    
+    &:hover {
+      transform: scale(1.1);
+    }
+  }
+  
+  &::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #1a73e8;
+    cursor: pointer;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  }
+}
+
 // ===== Hide Ionic chrome =====
 ion-header {
   display: none !important;

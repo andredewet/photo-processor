@@ -32,6 +32,21 @@
       {{ guidanceMessage }}
     </div>
     
+    <!-- Sensitivity Slider -->
+    <div class="sensitivity-control">
+      <label class="sensitivity-label">
+        <span class="label-text">Sensitivity</span>
+        <span class="label-value">{{ sensitivity < 0.33 ? 'Strict' : sensitivity < 0.66 ? 'Normal' : 'Lenient' }}</span>
+      </label>
+      <input 
+        type="range" 
+        class="sensitivity-slider"
+        min="0" 
+        max="1" 
+        step="0.1"
+        [(ngModel)]="sensitivity">
+    </div>
+    
     <!-- Hidden canvases -->
     <canvas #canvasElement style="display: none;"></canvas>
     <canvas #detectionCanvas style="display: none;"></canvas>

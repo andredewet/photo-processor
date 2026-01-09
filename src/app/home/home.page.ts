@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild, OnDestroy, OnInit, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Capacitor } from '@capacitor/core';
 import { ImageProcessingService, ProcessedImage } from '../services/image-processing.service';
 import FaceDetection, { FaceGuidance, getGuidanceMessage } from '../plugins/face-detection.plugin';
@@ -8,7 +9,7 @@ import FaceDetection, { FaceGuidance, getGuidanceMessage } from '../plugins/face
   selector: 'app-home',
   templateUrl: 'home.page.html',
   styleUrls: ['home.page.scss'],
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
 })
 export class HomePage implements OnInit, OnDestroy {
   @ViewChild('videoElement') videoElement!: ElementRef<HTMLVideoElement>;
@@ -32,6 +33,9 @@ export class HomePage implements OnInit, OnDestroy {
   private faceDetectionReady = false;
   private isDetecting = false;
   private detectionInterval: any = null;
+  
+  // Sensitivity control (0 = strict, 1 = lenient)
+  sensitivity = 0.5;
   
   // Oval bounds for face positioning (normalized 0-1)
   // Oval bounds - slightly taller than wide (face shape)
@@ -205,7 +209,8 @@ export class HomePage implements OnInit, OnDestroy {
 
       const result = await FaceDetection.detectFace({
         imageData: frameData,
-        ovalBounds: this.ovalBounds
+        ovalBounds: this.ovalBounds,
+        sensitivity: this.sensitivity
       });
 
       // Update UI in Angular zone

@@ -102,6 +102,7 @@ export class FaceDetectionWeb extends WebPlugin implements FaceDetectionPlugin {
   async detectFace(options: {
     imageData: string;
     ovalBounds: OvalBounds;
+    sensitivity?: number;
   }): Promise<FaceDetectionResult> {
     // Initialize if not already done
     if (!this.model) {
@@ -145,8 +146,9 @@ export class FaceDetectionWeb extends WebPlugin implements FaceDetectionPlugin {
         height: (prediction.bottomRight[1] - prediction.topLeft[1]) / img.height
       };
 
-      // Calculate guidance
-      const guidance = this.calculateGuidance(bounds, options.ovalBounds);
+      // Calculate guidance (sensitivity defaults to 0.5)
+      const sensitivity = options.sensitivity ?? 0.5;
+      const guidance = this.calculateGuidance(bounds, options.ovalBounds, sensitivity);
 
       return {
         faceDetected: true,
@@ -172,9 +174,12 @@ export class FaceDetectionWeb extends WebPlugin implements FaceDetectionPlugin {
     });
   }
 
-  private calculateGuidance(face: FaceBounds, oval: OvalBounds): FaceGuidance {
+  private calculateGuidance(face: FaceBounds, oval: OvalBounds, sensitivity: number): FaceGuidance {
+    // Sensitivity affects tolerances (0 = strict, 1 = lenient)
+    // Lerp between strict and lenient values
+    const lerp = (strict: number, lenient: number) => strict + (lenient - strict) * sensitivity;
+    
     // BlazeFace detects face features (eyes, nose, mouth) not full head
-    // Reduced padding for less sensitive detection
     const headPaddingTop = face.height * 0.40;   // 40% for forehead/hair
     const headPaddingBottom = face.height * 0.08; // 8% for chin
     const headPaddingSide = face.width * 0.10;   // 10% for ears
@@ -201,21 +206,28 @@ export class FaceDetectionWeb extends WebPlugin implements FaceDetectionPlugin {
     const ovalSize = Math.max(oval.radiusX * 2, oval.radiusY * 2);
     const sizeRatio = headSize / ovalSize;
     
-    // Too small = move closer (face should fill 80% of oval)
-    if (sizeRatio < 0.8) {
+    // Size thresholds affected by sensitivity
+    const minSizeRatio = lerp(0.85, 0.60);  // Strict: 85%, Lenient: 60%
+    const maxSizeRatio = lerp(1.10, 1.40);  // Strict: 110%, Lenient: 140%
+    
+    // Too small = move closer
+    if (sizeRatio < minSizeRatio) {
       return 'move_closer';
     }
     
-    // Too large = move back (face should be at most 115% of oval size)
-    if (sizeRatio > 1.15) {
+    // Too large = move back
+    if (sizeRatio > maxSizeRatio) {
       return 'move_back';
     }
     
+    // Overflow tolerance affected by sensitivity
+    const overflowTolerance = lerp(0, 0.08);  // Strict: 0, Lenient: 8%
+    
     // Calculate how far outside each edge the face is
-    const leftOverflow = ovalLeft - faceLeft;      // Positive = face too far left
-    const rightOverflow = faceRight - ovalRight;   // Positive = face too far right
-    const topOverflow = ovalTop - faceTop;         // Positive = face too high
-    const bottomOverflow = faceBottom - ovalBottom; // Positive = face too low
+    const leftOverflow = ovalLeft - faceLeft - overflowTolerance;
+    const rightOverflow = faceRight - ovalRight - overflowTolerance;
+    const topOverflow = ovalTop - faceTop - overflowTolerance;
+    const bottomOverflow = faceBottom - ovalBottom - overflowTolerance;
     
     // Find the largest overflow and return that direction
     const overflows = [
@@ -228,13 +240,13 @@ export class FaceDetectionWeb extends WebPlugin implements FaceDetectionPlugin {
     // Sort by overflow amount (largest first)
     overflows.sort((a, b) => b.value - a.value);
     
-    // If any edge is outside bounds, return the direction with largest overflow
+    // If any edge is outside bounds (accounting for tolerance), return direction
     if (overflows[0].value > 0) {
       return overflows[0].guidance;
     }
     
-    // Check center is reasonably close to oval center
-    const centerThreshold = 0.15;
+    // Center threshold affected by sensitivity
+    const centerThreshold = lerp(0.08, 0.25);  // Strict: 8%, Lenient: 25%
     const xOffset = Math.abs(faceCenterX - oval.centerX);
     const yOffset = Math.abs(faceCenterY - oval.centerY);
     

@@ -59,6 +59,8 @@ export interface FaceDetectionPlugin {
     imageData: string;
     /** The oval bounds to position the face within */
     ovalBounds: OvalBounds;
+    /** Sensitivity 0-1 (0 = strict, 1 = lenient) */
+    sensitivity?: number;
   }): Promise<FaceDetectionResult>;
 
   /**
