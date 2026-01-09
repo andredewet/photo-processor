@@ -1,0 +1,71 @@
+<!-- Camera UI -->
+<div class="camera-container" *ngIf="isCameraActive">
+  <div class="camera-preview-area">
+    <div class="video-frame">
+      <!-- Live video feed -->
+      <video 
+        #videoElement
+        class="camera-video"
+        [hidden]="!isWebCameraActive"
+        autoplay 
+        playsinline
+        muted
+        [class.mirror]="useFrontCamera">
+      </video>
+      
+      <!-- Oval guide overlay -->
+      <div class="oval-overlay"></div>
+      
+      <!-- Face silhouette (when no camera) -->
+      <div class="face-silhouette" *ngIf="!isWebCameraActive">
+        <svg viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="50" cy="45" rx="30" ry="35" />
+        </svg>
+      </div>
+    </div>
+    
+    <!-- Face Guidance Badge (between video and buttons) -->
+    <div class="guidance-badge" 
+         [class.success]="faceGuidance === 'hold_still'"
+         [class.warning]="faceGuidance !== 'hold_still' && faceGuidance !== 'no_face' && faceGuidance !== 'multiple_faces'"
+         [class.error]="faceGuidance === 'no_face' || faceGuidance === 'multiple_faces'">
+      {{ guidanceMessage }}
+    </div>
+    
+    <!-- Hidden canvases -->
+    <canvas #canvasElement style="display: none;"></canvas>
+    <canvas #detectionCanvas style="display: none;"></canvas>
+  </div>
+  
+  <div class="camera-controls">
+    <button 
+      class="btn-capture" 
+      [class.disabled]="faceGuidance !== 'hold_still'"
+      [disabled]="faceGuidance !== 'hold_still'"
+      (click)="captureAndProcess()">
+    </button>
+  </div>
+</div>
+
+<!-- Main Content (Processing / Result) -->
+<div class="app-container" *ngIf="!isCameraActive">
+  <!-- Processing -->
+  <div class="content-card" *ngIf="isProcessing">
+    <div class="spinner"></div>
+    <p class="processing-text">{{ processingStep }}</p>
+  </div>
+
+  <!-- Result -->
+  <div class="content-card" *ngIf="processedImage && !isProcessing">
+    <img [src]="processedImage.dataUrl" class="result-image" alt="Result">
+    <div class="result-info">
+      <span>{{ formatFileSize(processedImage.size) }}</span>
+      <span class="dot">·</span>
+      <span>256×256</span>
+    </div>
+    <div class="result-actions">
+      <button class="btn-secondary" (click)="retake()">Retake</button>
+      <button class="btn-primary" (click)="downloadImage()">Download</button>
+    </div>
+  </div>
+</div>

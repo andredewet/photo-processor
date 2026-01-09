@@ -1,0 +1,331 @@
+// ===== Compact iframe-friendly styles =====
+:host {
+  display: block;
+  background: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+  width: 100%;
+}
+
+html, body {
+  background: #ffffff !important;
+  margin: 0;
+  padding: 0;
+}
+
+// Main container
+.app-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 16px;
+  box-sizing: border-box;
+  background: #ffffff;
+  width: 100%;
+}
+
+.content-card {
+  text-align: center;
+  width: 100%;
+  max-width: 320px;
+  
+  h2 {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 0 12px;
+    color: #202124;
+  }
+}
+
+.pipeline-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #5f6368;
+  
+  .arrow {
+    color: #9aa0a6;
+  }
+}
+
+// Buttons
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 20px;
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+  
+  &:hover { background: #1557b0; }
+  &:active { transform: scale(0.98); }
+  
+  .btn-icon-inline {
+  font-size: 16px;
+  }
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  background: #fff;
+  color: #202124;
+  border: 1px solid #dadce0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  
+  &:hover { 
+    background: #f8f9fa;
+    border-color: #bdc1c6;
+  }
+  &:active { transform: scale(0.98); }
+}
+
+// Processing state
+.spinner {
+  width: 32px;
+  height: 32px;
+  margin: 0 auto 12px;
+  border: 3px solid #f8f9fa;
+  border-top-color: #1a73e8;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { 
+  to { transform: rotate(360deg); } 
+}
+
+.processing-text {
+  color: #5f6368;
+  font-size: 13px;
+  margin: 0;
+}
+
+// Result
+.result-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  border: 1px solid #dadce0;
+  margin-bottom: 12px;
+  object-fit: cover;
+  background: #f8f9fa;
+}
+
+.result-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #5f6368;
+  margin-bottom: 16px;
+  
+  .dot {
+    color: #dadce0;
+  }
+}
+
+.result-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  
+  button { 
+    flex: 1; 
+    max-width: 120px; 
+  }
+}
+
+// ===== Camera UI (Light theme) =====
+.camera-container {
+  position: fixed;
+  inset: 0;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+
+.camera-preview-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  min-height: 0;
+  background: #ffffff;
+}
+
+// Square video frame with oval overlay
+.video-frame {
+  position: relative;
+  width: min(280px, 80vw, 50vh);
+  height: min(280px, 80vw, 50vh);
+  background: #e8eaed;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid #dadce0;
+}
+
+.camera-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  
+  &.mirror { 
+    transform: scaleX(-1); 
+  }
+  
+  &[hidden] { 
+    display: none !important; 
+  }
+}
+
+// Oval guide as overlay - slightly taller than wide (face shape)
+.oval-overlay {
+  position: absolute;
+  top: 8%;
+  left: 18%;
+  right: 18%;
+  bottom: 8%;
+  border: 3px solid #1a73e8;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow: 0 0 0 2000px rgba(255, 255, 255, 0.5);
+}
+
+.face-silhouette {
+  position: absolute;
+  top: 20%;
+  left: 25%;
+  right: 25%;
+  bottom: 15%;
+  opacity: 0.2;
+  pointer-events: none;
+  
+  svg { 
+    width: 100%; 
+    height: 100%; 
+    fill: #9aa0a6; 
+  }
+}
+
+// Camera controls - centered row
+.camera-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  padding: 16px 0;
+  flex-shrink: 0;
+  background: #ffffff;
+}
+
+
+.btn-capture {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #1a73e8;
+  border: 3px solid #fff;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(26, 115, 232, 0.4);
+  transition: transform 0.1s, background 0.2s, opacity 0.2s;
+  
+  &:hover:not(.disabled) {
+    background: #1557b0;
+    transform: scale(1.05);
+  }
+  
+  &:active:not(.disabled) { 
+    transform: scale(0.95); 
+  }
+  
+  &.disabled {
+    background: #dadce0;
+    cursor: not-allowed;
+    opacity: 0.5;
+    box-shadow: none;
+  }
+}
+
+
+
+// ===== Face Guidance Badge (between video and buttons) =====
+.guidance-badge {
+  margin-top: 12px;
+  padding: 8px 20px;
+  border-radius: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  
+  // Default state (no face / initializing)
+  background: #f1f3f4;
+  color: #5f6368;
+  border: 1px solid #dadce0;
+  
+  // Success state (hold still)
+  &.success {
+    background: #e6f4ea;
+    color: #137333;
+    border-color: #34a853;
+  }
+  
+  // Warning state (move instructions)
+  &.warning {
+    background: #fef7e0;
+    color: #b45309;
+    border-color: #f9ab00;
+  }
+  
+  // Error state (no face / multiple)
+  &.error {
+    background: #fce8e6;
+    color: #c5221f;
+    border-color: #ea4335;
+  }
+}
+
+// ===== Hide Ionic chrome =====
+ion-header {
+  display: none !important;
+}
+
+
+
+
+
